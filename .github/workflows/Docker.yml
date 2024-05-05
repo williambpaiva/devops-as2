@@ -28,4 +28,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: williambpaiva/go_ci:${{ github.ref_name }}
+        tags: williambpaiva/go_ci:latest
