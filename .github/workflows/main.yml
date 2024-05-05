@@ -1,0 +1,77 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4.1.4
+    
+      - name: Docker Login
+      - uses: docker/login-action@v3.1.0
+        with:
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWORD }}
+          
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v5.3.0
+        with:
+          context: .
+          push: true
+          tags: |
+            williambpaiva/soma2devops:v1
+            williambpaiva/soma2devops:latest      
+        
+      - name: Docker compose tests run
+        uses: cloudposse/github-action-docker-compose-test-run@0.2.0
+
+
+      
+  sast:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Static Application Security Testing (SAST)
+        uses: AppThreat/sast-scan-action@master
+
+  deploy:
+    needs: sast
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          
+      - name: Deploy
+        run: |
+          echo "Deploying the project..."
+
+  alert:
+    runs-on: windows-latest
+    steps:
+      - name: Send Telegram Alert
+        env:
+          TELEGRAM_TOKEN: '7082971552:AAGbOG6amP--nccNR9Oxpr4cdJylx-3f2zU'
+          TELEGRAM_CHAT_ID: '-4245329360'
+        shell: pwsh
+        run: |
+          $url = "https://api.telegram.org/bot${env:TELEGRAM_TOKEN}/sendMessage"
+          $body = @{
+            chat_id = "${env:TELEGRAM_CHAT_ID}"
+            text = " -------NOTIFICACAO ENVIADA--------"
+          } | ConvertTo-Json
+          Invoke-RestMethod -Uri $url -Method Post -Body $body -ContentType "application/json"
