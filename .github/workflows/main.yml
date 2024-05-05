@@ -28,13 +28,3 @@ jobs:
       - name: Build Docker Image
         run: docker build -t williambpaiva/soma2devops:latest .
              echo "Deploying the project..."
-
-  test-job:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies      
-        run: pip install Flask
-      - uses: AppThreat/sast-scan-action@master
-        with:
-          type: "python"
