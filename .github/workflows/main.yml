@@ -6,7 +6,7 @@ on:
 
 jobs:
 
-  build-job:
+  docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.4
