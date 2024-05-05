@@ -17,8 +17,6 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           
       - name: Build and push Docker images
-        uses: docker/build-push-action@v5.3.0
-
-      - name: Build Docker Image
+        
         run: docker build -t williambpaiva/soma2devops:latest .
              echo "Deploying the project..."
